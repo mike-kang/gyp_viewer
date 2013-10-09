@@ -55,16 +55,21 @@ class TestFrame(wx.Frame):
                         self.tree.SetItemTextColour(valNode, wx.Colour(255,0,0))
                         self.tree.Expand(keyNode)
                         bFind = True
+                elif type(val) == int:
+                    valNode = self.tree.AppendItem(keyNode, str(val))
                 elif type(val) == dict or type(val) == list:
                     bExt = self.AddTreeNodes(keyNode, val)
                     if bExt:
                         self.tree.Expand(keyNode)
+
                     
         elif type(items) == list:
             for i in range(len(items)):
                 val = items[i]
                 if type(val) == str:
                     self.tree.AppendItem(parentItem, val)
+                elif type(val) == int:
+                    self.tree.AppendItem(parentItem, str(val))
                 else:
                     idxNode = self.tree.AppendItem(parentItem, str(i))
                     bExt = self.AddTreeNodes(idxNode, val)
@@ -91,7 +96,7 @@ class TestFrame(wx.Frame):
         print "OnActivated:    ", self.GetItemText(evt.GetItem())
  
  
-#app = wx.PySimpleApp(redirect=True) #for debug
+#app = wx.PySimpleApp(redirect=True)
 app = wx.PySimpleApp()
 frame = TestFrame()
 frame.Show()
