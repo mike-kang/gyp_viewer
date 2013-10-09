@@ -11,7 +11,8 @@ sudo apt-get install python-wxgtk2.8 python-wxtools wx2.8-i18n libwxgtk2.8-dev l
 
 how to
 ======
-./gyp_view.py <gyp file>
+./gyp_view.py gypfile
+ex) ./gyp_view.py aa.gyp
 
  
 
