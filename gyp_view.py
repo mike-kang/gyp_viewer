@@ -3,6 +3,7 @@
 import wx
 import os
 import sys
+import re
  
 class TestFrame(wx.Frame):
     def __init__(self):
@@ -76,6 +77,14 @@ class TestFrame(wx.Frame):
                     if bExt:
                         self.tree.Expand(idxNode)
         return (bExt or bFind)        
+    
+    def SearchItem(self, item, val, items):
+    """ 
+    item : start node 
+    val : key string
+    items : result list
+    """
+        return items
                  
     def GetItemText(self, item):
         if item:
