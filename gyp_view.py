@@ -7,7 +7,7 @@ import re
  
 class TestFrame(wx.Frame):
     def __init__(self):
-        wx.Frame.__init__(self, None, title="gyp viewer", size=(400,500))
+        wx.Frame.__init__(self, None, title=sys.argv[1], size=(400,500))
  
         # Create the tree
         self.tree = wx.TreeCtrl(self)
@@ -79,11 +79,11 @@ class TestFrame(wx.Frame):
         return (bExt or bFind)        
     
     def SearchItem(self, item, val, items):
-    """ 
-    item : start node 
-    val : key string
-    items : result list
-    """
+        """ 
+        item : start node 
+        val : key string
+        items : result list
+        """
         return items
                  
     def GetItemText(self, item):
