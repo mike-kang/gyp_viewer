@@ -8,7 +8,7 @@ import re
 class TestFrame(wx.Frame):
     def __init__(self):
         wx.Frame.__init__(self, None, title=sys.argv[1], size=(400,500))
- 
+        print os.environ['_'] 
         # Create the tree
         self.tree = wx.TreeCtrl(self)
         self.tree.SetWindowStyle(wx.TR_HAS_BUTTONS | wx.TR_HIDE_ROOT)
@@ -102,8 +102,13 @@ class TestFrame(wx.Frame):
         print "OnSelChanged:   ", self.GetItemText(evt.GetItem())
  
     def OnActivated(self, evt):
-        print "OnActivated:    ", self.GetItemText(evt.GetItem())
- 
+        val = self.GetItemText(evt.GetItem())
+        print "OnActivated:    ", val
+        so = re.match('.*\.gypi?', val)
+        if so: 
+            if os.fork() == 0:
+                dirname = os.path.dirname(os.path.realpath(sys.argv[1]))
+                os.execl(os.environ['_'],"gyp_view.py", os.path.join(dirname, so.group())) 
  
 #app = wx.PySimpleApp(redirect=True)
 app = wx.PySimpleApp()
