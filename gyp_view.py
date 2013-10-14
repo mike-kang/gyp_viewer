@@ -7,8 +7,17 @@ import re
  
 class TestFrame(wx.Frame):
     def __init__(self):
-        wx.Frame.__init__(self, None, title=sys.argv[1], size=(400,500))
         print os.environ['_'] 
+        config = os.path.join(os.path.dirname(os.environ['_']), 'gyp_view.ini')
+        t = os.path.realpath(sys.argv[1])
+        if os.path.exists(config):
+            f = file(config)
+            s = f.read()
+            data = eval(s)
+            print data['depth']
+            t = t.replace(data['depth'], '')
+        wx.Frame.__init__(self, None, title=t, size=(400,500))
+        #print os.environ['_'] 
         # Create the tree
         self.tree = wx.TreeCtrl(self)
         self.tree.SetWindowStyle(wx.TR_HAS_BUTTONS | wx.TR_HIDE_ROOT)
