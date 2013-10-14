@@ -15,7 +15,10 @@ class TestFrame(wx.Frame):
             s = f.read()
             data = eval(s)
             #print data['depth']
-            t = t.replace(data['depth'], '')
+            for p in data['depths']:
+                if t.find(p,0) == 0:
+                    t = t.replace(p, '')
+                    break
         wx.Frame.__init__(self, None, title=t, size=(400,500))
         #print os.environ['_'] 
         # Create the tree
