@@ -7,26 +7,38 @@ import re
  
 class TestFrame(wx.Frame):
     def __init__(self):
-        #print os.environ['_'] 
-        config = os.path.join(os.path.dirname(os.environ['_']), 'gyp_view.ini')
-        t = os.path.realpath(sys.argv[1])
+        #print os.environ['_']
+        self.cwd = os.path.dirname(os.environ['_']) 
+        config = os.path.join(self.cwd, 'gyp_view.ini')
+        self.gypfile = os.path.realpath(sys.argv[1])
+        t = self.gypfile
         if os.path.exists(config):
             f = file(config)
             s = f.read()
             data = eval(s)
             #print data['depth']
             for p in data['depths']:
-                if t.find(p,0) == 0:
-                    t = t.replace(p, '')
+                if self.gypfile.find(p,0) == 0:
+                    t = self.gypfile.replace(p, '')
                     break
         wx.Frame.__init__(self, None, title=t, size=(400,500))
         #print os.environ['_'] 
+
+        self.toolbarData =  (("Search", "search.bmp", "Search", self.OnSearch),
+                ("", "", "", ""),
+                ("vi", "open.bmp", "vi", self.OnVi),
+                ("Refesh", "save.bmp", "Refresh", self.OnRefresh))
+        
+        self.toolbarColorData =  ("Black", "Red", "Green", "Blue")
+#memubar = wx.MenuBar()
+        self.createToolBar()
+
         # Create the tree
         self.tree = wx.TreeCtrl(self)
         self.tree.SetWindowStyle(wx.TR_HAS_BUTTONS | wx.TR_HIDE_ROOT)
         # Add a root node
         root = self.tree.AddRoot("GYP")
-        if not os.access(sys.argv[1], os.F_OK):
+        if not os.access(self.gypfile, os.F_OK):
             dlg = wx.MessageDialog(None, 'File is not exist!',
                                    'MessageDialog', wx.OK).ShowModal()
             self.Close() 
@@ -119,9 +131,52 @@ class TestFrame(wx.Frame):
         so = re.match('.*\.gypi?', val)
         if so: 
             if os.fork() == 0:
-                dirname = os.path.dirname(os.path.realpath(sys.argv[1]))
+                dirname = os.path.dirname(self.gypfile)
                 os.execl(os.environ['_'],"gyp_view.py", os.path.join(dirname, so.group())) 
- 
+
+    def OnSearch(self, event): pass
+    def OnVi(self, event):
+        print 'vi'
+        if os.fork() == 0:
+            os.execl('/usr/bin/gedit',"vim", self.gypfile) 
+
+    def OnRefresh(self, event): pass
+
+    def createToolBar(self):
+        toolbar = self.CreateToolBar()
+        for each in self.toolbarData:
+            self.createSimpleTool(toolbar, *each)
+        toolbar.AddSeparator()
+        for each in self.toolbarColorData:
+            self.createColorTool(toolbar, each)
+        toolbar.Realize()
+
+    def createSimpleTool(self, toolbar, label, filename, help, handler):
+        if not label:
+            toolbar.AddSeparator()
+            return
+        bmp = wx.Image(os.path.join(self.cwd, filename), wx.BITMAP_TYPE_BMP).ConvertToBitmap()
+        tool = toolbar.AddSimpleTool(-1, bmp, label, help)
+        self.Bind(wx.EVT_MENU, handler, tool) 
+
+    def createColorTool(self, toolbar, color):
+        bmp = self.MakeBitmap(color)
+        tool = toolbar.AddSimpleTool(-1, bmp, color)
+        #self.Bind(wx.EVT_MENU, self.OnColor, tool)
+
+    def MakeBitmap(self, color):
+        bmp = wx.EmptyBitmap(16, 15)
+        dc = wx.MemoryDC()
+        dc.SelectObject(bmp)
+        dc.SetBackground(wx.Brush(color))
+        dc.Clear()
+        dc.SelectObject(wx.NullBitmap)
+        return bmp
+
+    def toolbarColorData(self):
+        return ("Black", "Red", "Green", "Blue")
+
+
 #app = wx.PySimpleApp(redirect=True)
 app = wx.PySimpleApp()
 frame = TestFrame()
