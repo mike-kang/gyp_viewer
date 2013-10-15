@@ -11,8 +11,8 @@ class TestFrame(wx.Frame):
         self.result = []
         wx.Frame.__init__(self, None, -1, "Searcher")
         sizer = wx.GridBagSizer(hgap=5, vgap=3)
-        
-        self.tc = wx.TextCtrl(self, -1, "", pos=(40, 10))
+        #self.tc = wx.TextCtrl(self, -1, "", pos=(40, 10))
+        self.tc = wx.TextCtrl(self, -1, "", size=(300, 10))
         sizer.Add(self.tc, pos=(0,0), span=(1,1), flag=wx.EXPAND)
 
         fb = wx.Button(self, label='find')
@@ -21,15 +21,13 @@ class TestFrame(wx.Frame):
         
         #sampleList = ['0', '1', '2', '3', '4']
         #listBox = wx.ListBox(self, -1, (20, 20), (80, 120), sampleList, wx.LB_SINGLE)
-        self.list = wx.ListCtrl(self, -1, style=wx.LC_REPORT)
+        self.list = wx.ListCtrl(self, -1, size=(350,250), style=wx.LC_REPORT)
         self.list.InsertColumn(0, 'file')
         self.list.InsertColumn(1, 'contents')
         self.list.SetColumnWidth(0,70)
-        self.list.SetColumnWidth(1,wx.LIST_AUTOSIZE)
-        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected, self.list)
+        self.list.SetColumnWidth(1,200)
+        #self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected, self.list)
         self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnItemActivated, self.list)
-
-
         sizer.Add(self.list, pos=(1,0), span=(1,2), flag=wx.EXPAND)
 
         sizer.AddGrowableCol(0)
@@ -52,6 +50,7 @@ class TestFrame(wx.Frame):
             self.fileDB = []
             #print dialog.GetPath()
             self.root = dialog.GetPath()
+            self.SetTitle('Searcher: ' + self.root)        
             for root, dirs, files in os.walk(self.root):
                 for f in files:
                     if f.endswith('.gyp') or f.endswith('.gypi'):
@@ -82,11 +81,9 @@ class TestFrame(wx.Frame):
             i=i+1
             self.sb.SetStatusText(str(i))
         #print self.result
-#	for item in self.result:
-#            i = self.list.InsertStringItem(sys.maxint, item[0])
-#            self.list.SetStringItem(i, 1, item[1])
-    def OnItemSelected(self, evt):
-        item = evt.GetItem()
+
+#    def OnItemSelected(self, evt):
+#        item = evt.GetItem()
         #print "Item Selected:", item.GetText()
 
     def OnItemActivated(self, evt):
