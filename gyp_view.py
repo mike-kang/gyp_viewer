@@ -27,7 +27,7 @@ class TestFrame(wx.Frame):
         self.toolbarData =  (("Search", "search.bmp", "Search", self.OnSearch),
                 ("", "", "", ""),
                 ("vi", "open.bmp", "vi", self.OnVi),
-                ("Refesh", "save.bmp", "Refresh", self.OnRefresh))
+                ("Refesh", "refresh.bmp", "Refresh", self.OnRefresh))
         
         self.toolbarColorData =  ("Black", "Red", "Green", "Blue")
 #memubar = wx.MenuBar()
