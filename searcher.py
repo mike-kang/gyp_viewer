@@ -2,13 +2,13 @@
 
 import wx
 import os
-
-labels = "1 2 3 4 5 6 7 8 9 0".split()
+import sys
 
 class TestFrame(wx.Frame):
     def __init__(self):
         self.cwd = os.path.dirname(os.environ['_'])
         self.fileDB = []
+        self.result = []
         wx.Frame.__init__(self, None, -1, "Searcher")
         sizer = wx.GridBagSizer(hgap=5, vgap=3)
         
@@ -19,9 +19,18 @@ class TestFrame(wx.Frame):
         sizer.Add(fb, pos=(0,1))
         fb.Bind(wx.EVT_BUTTON, self.OnFind)
         
-        sampleList = ['0', '1', '2', '3', '4']
-        listBox = wx.ListBox(self, -1, (20, 20), (80, 120), sampleList, wx.LB_SINGLE)
-        sizer.Add(listBox, pos=(1,0), span=(1,2), flag=wx.EXPAND)
+        #sampleList = ['0', '1', '2', '3', '4']
+        #listBox = wx.ListBox(self, -1, (20, 20), (80, 120), sampleList, wx.LB_SINGLE)
+        self.list = wx.ListCtrl(self, -1, style=wx.LC_REPORT)
+        self.list.InsertColumn(0, 'file')
+        self.list.InsertColumn(1, 'contents')
+        self.list.SetColumnWidth(0,70)
+        self.list.SetColumnWidth(1,wx.LIST_AUTOSIZE)
+        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected, self.list)
+        self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnItemActivated, self.list)
+
+
+        sizer.Add(self.list, pos=(1,0), span=(1,2), flag=wx.EXPAND)
 
         sizer.AddGrowableCol(0)
         sizer.AddGrowableRow(1)
@@ -37,11 +46,13 @@ class TestFrame(wx.Frame):
 	self.sb = self.CreateStatusBar()
         self.sb.SetStatusText('Search file is need!')
 
-    def OnOpen(self, event):
+    def OnOpen(self, evt):
         dialog = wx.DirDialog(None, "Choose a directory:",style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
         if dialog.ShowModal() == wx.ID_OK:
+            self.fileDB = []
             #print dialog.GetPath()
-            for root, dirs, files in os.walk(dialog.GetPath()):
+            self.root = dialog.GetPath()
+            for root, dirs, files in os.walk(self.root):
                 for f in files:
                     if f.endswith('.gyp') or f.endswith('.gypi'):
                         self.fileDB.append(os.path.join(root, f))
@@ -50,23 +61,42 @@ class TestFrame(wx.Frame):
             
         dialog.Destroy()
 
-    def OnFind(self, event):
+    def OnFind(self, evt):
+        self.result = []
+        self.list.DeleteAllItems()
         key = self.tc.GetValue()
         i = 0
+        
         for fname in self.fileDB:
             #print '::' +fname
             f = open(fname)
             try:
                 for line in f:
                     if line.find(key) > -1:
-                        #print ':' + line
-                        pass
+                        tmp = (fname.replace(self.root + '/', ''), line)
+                        self.result.append(tmp)
+                        index = self.list.InsertStringItem(sys.maxint, tmp[0])
+                        self.list.SetStringItem(index, 1, tmp[1])
             except UnicodeDecodeError:
-                print '::' +fname
-                print line
-                #return
+                pass
             i=i+1
             self.sb.SetStatusText(str(i))
+        #print self.result
+#	for item in self.result:
+#            i = self.list.InsertStringItem(sys.maxint, item[0])
+#            self.list.SetStringItem(i, 1, item[1])
+    def OnItemSelected(self, evt):
+        item = evt.GetItem()
+        #print "Item Selected:", item.GetText()
+
+    def OnItemActivated(self, evt):
+        item = evt.GetItem()
+        #print "Item Activated:", item.GetText()
+        if os.fork() == 0:
+            dirname = os.path.dirname(os.environ['_'])
+            os.execl(os.path.join(dirname, 'gyp_view.py'), 'gyp_view.py', os.path.join(self.root, item.GetText()))
+
+
 app = wx.PySimpleApp()
 TestFrame().Show()
 
