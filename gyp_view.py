@@ -37,18 +37,13 @@ class TestFrame(wx.Frame):
         # Create the tree
         self.tree = wx.TreeCtrl(self)
         self.tree.SetWindowStyle(wx.TR_HAS_BUTTONS | wx.TR_HIDE_ROOT)
-        # Add a root node
-        root = self.tree.AddRoot("GYP")
+        
         if not os.access(self.gypfile, os.F_OK):
             dlg = wx.MessageDialog(None, 'File is not exist!',
                                    'MessageDialog', wx.OK).ShowModal()
             self.Close() 
-        #f = file('/home/san/project/chromium/src/build/all.gyp')
-        f = file(sys.argv[1])
-        s = f.read()
-        data = eval(s)
-        #print data
-        self.AddTreeNodes(root, data)
+        
+        self.drawTree()
  
         # Bind some interesting events
         self.Bind(wx.EVT_TREE_ITEM_EXPANDED, self.OnItemExpanded, self.tree)
@@ -57,8 +52,17 @@ class TestFrame(wx.Frame):
         self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.OnActivated, self.tree)
  
         # Expand the first level
-        self.tree.Expand(root)
+        #self.tree.Expand(root)
  
+    def drawTree(self):
+        #f = file('/home/san/project/chromium/src/build/all.gyp')
+        f = file(sys.argv[1])
+        s = f.read()
+        data = eval(s)
+        # Add a root node
+        root = self.tree.AddRoot("GYP")
+        #print data
+        self.AddTreeNodes(root, data)
  
     def AddTreeNodes(self, parentItem, items):
         """
@@ -142,7 +146,9 @@ class TestFrame(wx.Frame):
         #    os.execl('/usr/bin/gedit',"gedit", self.gypfile) 
         subprocess.Popen(['gnome-terminal','-x', 'sh', '-c', 'vim '+ self.gypfile])
 
-    def OnRefresh(self, event): pass
+    def OnRefresh(self, event):
+        self.tree.DeleteAllItems()
+        self.drawTree()
 
     def createToolBar(self):
         toolbar = self.CreateToolBar()
