@@ -4,6 +4,7 @@ import wx
 import os
 import sys
 import re
+import subprocess
  
 class TestFrame(wx.Frame):
     def __init__(self):
@@ -137,8 +138,9 @@ class TestFrame(wx.Frame):
     def OnSearch(self, event): pass
     def OnVi(self, event):
         print 'vi'
-        if os.fork() == 0:
-            os.execl('/usr/bin/gedit',"vim", self.gypfile) 
+        #if os.fork() == 0:
+        #    os.execl('/usr/bin/gedit',"gedit", self.gypfile) 
+        subprocess.Popen(['gnome-terminal','-x', 'sh', '-c', 'vim '+ self.gypfile])
 
     def OnRefresh(self, event): pass
 
