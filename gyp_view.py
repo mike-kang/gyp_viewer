@@ -146,14 +146,16 @@ class TestFrame(wx.Frame):
     print "OnSelChanged:   ", self.GetItemText(evt.GetItem())
  
   def OnActivated(self, evt):
-    val = self.GetItemText(evt.GetItem())
-    print "OnActivated:  ", val
-    so = re.match('.*\.gypi?', val)
-    if so: 
+    path = self.GetItemText(evt.GetItem())
+    print "OnActivated:  ", path
+    dirname = os.path.dirname(self.gypfile)
+    if path.endswith('.gyp') or path.endswith('.gypi'): 
       if os.fork() == 0:
-        dirname = os.path.dirname(self.gypfile)
-        os.execl(os.environ['_'],"gyp_view.py", os.path.join(dirname, so.group())) 
-
+        execution = os.path.join(os.path.dirname(os.environ['_']), 'gyp_view.py')
+        os.execl(execution, "gyp_view.py", os.path.join(dirname, path)) 
+    elif path.endswith('.grd'):
+      subprocess.Popen(['gnome-terminal','-x', 'sh', '-c', 'vim '+ os.path.join(dirname, path)])
+ 
   def OnSearch(self, event):
     dlg = wx.TextEntryDialog(None, "Search string with Regular Expression...",
                    'Search', '');
